@@ -51,6 +51,24 @@ function commentOnDiscussion(body) {
 	}).then((response) => response.json());
 }
 
+/**
+ * Transpose array.
+ *
+ * @param {any[][]} matrix
+ */
+function transpose(matrix) {
+	return matrix[0].map((_, i) => matrix.map((row) => row[i]));
+}
+
+/**
+ * Add emoji colored based on a number.
+ *
+ * @param {number} number
+ */
+function addEmoji(number) {
+	return `${number < 50 ? "🔴" : number < 90 ? "🟡" : "🟢"} ${number}`;
+}
+
 /** @type {import("../../types").lighthouseResult} */
 let data;
 
@@ -71,19 +89,39 @@ try {
 try {
 	let output =
 		"# This week’s Lighthouse scores\n" +
-		"| URL | Device | Accessibility | Best Practices | Performace " +
-		"| Progressive Web App | SEO | PageSpeed Insights |\n" +
-		"| - | - | - | - | - | - | - | - |\n";
+		"<table><thead><th>URL<td>Device</td>" +
+		"<td>Accessibility</td>" +
+		"<td>Best Practices</td>" +
+		"<td>Performace</td>" +
+		"<td>Progressive Web App</td>" +
+		"<td>SEO</td>" +
+		"<td>Overall</td>" +
+		"<td>PageSpeed Insights</td></th></thead><tbody>";
 
 	for (const result of data.data) {
+		const url = (result.url.at(-1) === "/" ? result.url : result.url + "/").split(
+			/https?:\/\/.+\..+?(?=\/)/iu,
+		)[1];
+		const scores = Object.values(result.scores);
+		const overallScore = scores.reduce((a, b) => a + b, 0);
 		output +=
-			`|${result.url} | ${result.emulatedFormFactor} | ${Object.values(result.scores)
-				.map((number) => `${number < 50 ? "🔴" : number < 90 ? "🟡" : "🟢"} ${number}`)
-				.join(
-					" | ",
-				)} | [More information](https://developers.google.com/speed/pagespeed/insights/` +
-			`?url=${encodeURIComponent(result.url.trim())}&tab=${result.emulatedFormFactor}) |\n`;
+			`<tr>${url}</td>` +
+			`<td>${result.emulatedFormFactor}</td>` +
+			`<td>${scores.map(addEmoji).join("</td><td>")}</td>` +
+			`<td>${addEmoji(overallScore)}</td>` +
+			`<td>[More information](https://developers.google.com/speed/pagespeed/insights/?url=` +
+			`${encodeURIComponent(result.url.trim())}&tab=${result.emulatedFormFactor})</tr>`;
 	}
+
+	const allScores = transpose(data.data.map(({ scores: s }) => Object.values(s))).map(
+			(s) => s.reduce((a, b) => a + b, 0) / s.length,
+		),
+		overallScore = allScores.reduce((a, b) => a + b, 0) / allScores.length;
+
+	output +=
+		`</tbody><tfoot><tr><td colspan="2"><b>Overall</b></td>` +
+		`<td>${allScores.map(addEmoji).join("</td><td>")}</td>` +
+		`<td colspan="2"><b><i>${addEmoji(overallScore)}</i></b></td></tr></tbody></table>`;
 
 	commentOnDiscussion(output);
 } catch (error) {
