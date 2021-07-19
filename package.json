@@ -2,6 +2,7 @@
   "name": "lighthouse-auditor",
   "version": "1.0.0",
   "main": ".github/workflows/lighthouse.js",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/RedGuy12/lighthouse-auditor.git"
