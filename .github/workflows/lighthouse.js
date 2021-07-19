@@ -77,12 +77,12 @@ try {
 
 	for (const result of data.data) {
 		output +=
-			`| ${result.url} | ${result.emulatedFormFactor} | ${Object.values(result.scores)
+			`|${result.url} | ${result.emulatedFormFactor} | ${Object.values(result.scores)
 				.map((number) => `${number < 50 ? "🔴" : number < 90 ? "🟡" : "🟢"} ${number}`)
 				.join(
 					" | ",
 				)} | [More information](https://developers.google.com/speed/pagespeed/insights/` +
-			`?url=${encodeURIComponent(result.url)}&tab=${result.emulatedFormFactor}) |\n`;
+			`?url=${encodeURIComponent(result.url.trim())}&tab=${result.emulatedFormFactor}) |\n`;
 	}
 
 	commentOnDiscussion(output);
