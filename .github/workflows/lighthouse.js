@@ -33,7 +33,7 @@ function commentOnDiscussion(body) {
 			// Hmmst… query strings break prettier formatting...mustache? maybe
 			query: graphql`mutation {
 					addDiscussionComment(
-						input: {discussionId: "MDEwOkRpc2N1c3Npb24zNDEwNDA2", body: "${body}"}
+						input: {discussionId: "MDEwOkRpc2N1c3Npb24zNDY2NDAy", body: "${body}"}
 					) {
 					  comment {
 						id
