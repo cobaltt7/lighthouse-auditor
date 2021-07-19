@@ -17,23 +17,23 @@ jobs:
                   ref: ${{ github.head_ref }}
                   token: ${{ secrets.TOKEN }}
 
-#            - name: Analyze
-#              uses: foo-software/lighthouse-check-action@master
-#              id: lighthouse
-#              with:
-#                  emulatedFormFactor: all
-#                  locale: en
-#                  prCommentEnabled: false
-#                  verbose: true
-#                  urls: >-
-#                      https://homeschool.rebeccareid.com,
-#                      https://homeschool.rebeccareid.com/posts/,
-#                      https://homeschool.rebeccareid.com/yes-you-can-homeschool/,
-#                      https://homeschool.rebeccareid.com/product/yes-you-can-homeschool-ecourse/,
-#                      https://homeschool.rebeccareid.com/vip/,
-#                      https://homeschool.rebeccareid.com/rebecca-reid/,
-#                      https://homeschool.rebeccareid.com/product/marco-polos-silk-road-game/,
-#                      https://homeschool.rebeccareid.com/courses/
+            - name: Analyze
+              uses: foo-software/lighthouse-check-action@master
+              id: lighthouse
+              with:
+                  emulatedFormFactor: all
+                  locale: en
+                  prCommentEnabled: false
+                  verbose: true
+                  urls: >-
+                      https://homeschool.rebeccareid.com,
+                      https://homeschool.rebeccareid.com/posts/,
+                      https://homeschool.rebeccareid.com/yes-you-can-homeschool/,
+                      https://homeschool.rebeccareid.com/product/yes-you-can-homeschool-ecourse/,
+                      https://homeschool.rebeccareid.com/vip/,
+                      https://homeschool.rebeccareid.com/rebecca-reid/,
+                      https://homeschool.rebeccareid.com/product/marco-polos-silk-road-game/,
+                      https://homeschool.rebeccareid.com/courses/
 
             - name: Setup Node.JS
               if: ${{ !cancelled() }}
@@ -46,14 +46,14 @@ jobs:
               if: ${{ !cancelled() }}
               run: npm install
 
-#            - name: Comment
-#              if: success()
-#              run:
-#                  node --trace-warnings --harmony .github/workflows/lighthouse.js '${{
-#                  secrets.TOKEN }}' '${{ join(steps.lighthouse.outputs.*, '\n') }}' ''
-
             - name: Comment
-#              if: failure()
+              if: success()
               run:
                   node --trace-warnings --harmony .github/workflows/lighthouse.js '${{
-                  secrets.TOKEN }}' '{}' ''
+                  secrets.TOKEN }}' '${{ join(steps.lighthouse.outputs.*, '\n') }}' ''
+
+            - name: Comment
+              if: failure()
+              run:
+                  node --trace-warnings --harmony .github/workflows/lighthouse.js '${{
+                  secrets.TOKEN }}' '{}' '1'
