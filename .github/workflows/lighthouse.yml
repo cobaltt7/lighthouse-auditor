@@ -44,7 +44,7 @@ jobs:
 
             - name: Install
               if: ${{ !cancelled() }}
-              run: npm install node_fetch
+              run: npm install
 
             - name: Comment
               if: success()
