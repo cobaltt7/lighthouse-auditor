@@ -69,6 +69,7 @@ function addEmoji(number) {
 	return `${number < 50 ? "🔴" : number < 90 ? "🟡" : "🟢"} ${number}`;
 }
 
+/** @type {import("../../types").lighthouseResult} */
 let data;
 
 try {
@@ -86,42 +87,42 @@ try {
 }
 
 try {
-	let output =
-		"# This week’s Lighthouse scores\n\n" +
-		"<table><thead><th>URL<td>Device</td>" +
-		"<td>Accessibility</td>" +
-		"<td>Best Practices</td>" +
-		"<td>Performace</td>" +
-		"<td>Progressive Web App</td>" +
-		"<td>SEO</td>" +
-		"<td>Overall</td>" +
-		"<td>PageSpeed Insights</td></th></thead><tbody>";
-
-	for (const result of data.data) {
-		const url = (result.url[result.url.length - 1] === "/" ? result.url : result.url + "/")
-			.trim()
-			.split(/^(?:https?:\/\/)?.+\..+?(?=\/)/iu)[1];
-		const scores = Object.values(result.scores);
-		const overallScore = scores.reduce((a, b) => a + b, 0)/scores.length;
-		output +=
-			`<tr><td>${url}</td>` +
-			`<td>${result.emulatedFormFactor}</td>` +
-			`<td>${scores.map(addEmoji).join("</td><td>")}</td>` +
-			`<td>${addEmoji(overallScore)}</td>` +
-			`<td><a href="https://developers.google.com/speed/pagespeed/insights/?url=${encodeURIComponent(
-				result.url.trim(),
-			)}&tab=${result.emulatedFormFactor}">More information</a></td></tr>`;
-	}
-
 	const allScores = transpose(data.data.map(({ scores: s }) => Object.values(s))).map(
 			(s) => s.reduce((a, b) => a + b, 0) / s.length,
 		),
-		overallScore = allScores.reduce((a, b) => a + b, 0) / allScores.length;
-
-	output +=
-		`</tbody><tfoot><tr><td colspan="2"><b>Overall</b></td>` +
-		`<td><b>${allScores.map(addEmoji).join("</b></td><td><b>")}</b></td>` +
-		`<td colspan="2"><b><i>${addEmoji(overallScore)}</i></b></td></tr></tbody></table>`;
+		output =
+			"# This week’s Lighthouse scores\n\n" +
+			"<table><thead><th>URL<td>Device</td>" +
+			"<td>Accessibility</td>" +
+			"<td>Best Practices</td>" +
+			"<td>Performace</td>" +
+			"<td>Progressive Web App</td>" +
+			"<td>SEO</td>" +
+			"<td>Overall</td>" +
+			"<td>PageSpeed Insights</td></th></thead><tbody>" +
+			data.data.reduce((accumulated, result) => {
+				const scores = Object.values(result.scores);
+				return (
+					accumulated +
+					`<tr><td>${
+						(result.url[result.url.length - 1] === "/" ? result.url : result.url + "/")
+							.trim()
+							.split(/^(?:https?:\/\/)?.+\..+?(?=\/)/iu)[1]
+					}</td>` +
+					`<td>${result.emulatedFormFactor}</td>` +
+					`<td>${scores.map(addEmoji).join("</td><td>")}</td>` +
+					`<td>${addEmoji(scores.reduce((a, b) => a + b, 0) / scores.length)}</td>` +
+					`<td><a href="//developers.google.com/speed/pagespeed/insights/` +
+					`?url=${encodeURIComponent(result.url.trim())}&tab=${
+						result.emulatedFormFactor
+					}">More information</a></td></tr>`
+				);
+			}, {}) +
+			`</tbody><tfoot><tr><td colspan="2"><b>Overall</b></td>` +
+			`<td><b>${allScores.map(addEmoji).join("</b></td><td><b>")}</b></td>` +
+			`<td colspan="2"><b><i>${addEmoji(
+				allScores.reduce((a, b) => a + b, 0) / allScores.length,
+			)}</i></b></td></tr></tbody></table>`;
 
 	commentOnDiscussion(output);
 } catch (error) {
