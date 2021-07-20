@@ -91,7 +91,7 @@ try {
 			(s) => s.reduce((a, b) => a + b, 0) / s.length,
 		),
 		output =
-			"# This week’s Lighthouse scores\n\n" +
+			"# Today’s Lighthouse scores\n\n" +
 			"<table><thead><th>URL<td>Device</td>" +
 			"<td>Accessibility</td>" +
 			"<td>Best Practices</td>" +
