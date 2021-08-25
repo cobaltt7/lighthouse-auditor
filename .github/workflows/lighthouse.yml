@@ -1,4 +1,3 @@
-
 name: Run Lighthouse
 on:
     workflow_dispatch:
@@ -8,18 +7,19 @@ on:
 jobs:
     run:
         name: Run Lighthouse
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
 
         steps:
             - name: Checkout
-              uses: actions/checkout@main
+              uses: actions/checkout@v2.3.4
               with:
                   ref: ${{ github.head_ref }}
                   token: ${{ secrets.TOKEN }}
 
             - name: Analyze
-              uses: foo-software/lighthouse-check-action@master
+              uses: foo-software/lighthouse-check-action@v4.0.0
               id: lighthouse
+              continue-on-error: true
               with:
                   emulatedFormFactor: all
                   locale: en
@@ -36,24 +36,22 @@ jobs:
                       https://homeschool.rebeccareid.com/courses/
 
             - name: Setup Node.JS
-              if: ${{ !cancelled() }}
-              uses: actions/setup-node@main
+              uses: actions/setup-node@v2.4.0
               with:
-                  node-version: 14
+                  node-version: 16
                   cache: "npm"
 
             - name: Install
-              if: ${{ !cancelled() }}
-              run: npm install
+              run: npm install --force
 
             - name: Comment
-              if: success()
+              if: steps.lighthouse.outcome == 'success'
               run:
                   node --trace-warnings --harmony .github/workflows/lighthouse.js '${{
                   secrets.TOKEN }}' '${{ join(steps.lighthouse.outputs.*, '\n') }}' ''
 
             - name: Comment
-              if: failure()
+              if: steps.lighthouse.outcome != 'success'
               run:
                   node --trace-warnings --harmony .github/workflows/lighthouse.js '${{
                   secrets.TOKEN }}' '{}' '1'
