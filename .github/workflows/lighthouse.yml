@@ -26,14 +26,22 @@ jobs:
                   prCommentEnabled: false
                   verbose: true
                   urls: >-
-                      https://homeschool.rebeccareid.com,
-                      https://homeschool.rebeccareid.com/posts/,
-                      https://homeschool.rebeccareid.com/yes-you-can-homeschool/,
-                      https://homeschool.rebeccareid.com/product/yes-you-can-homeschool-ecourse/,
-                      https://homeschool.rebeccareid.com/vip/,
+                      https://homeschool.rebeccareid.com/,
                       https://homeschool.rebeccareid.com/rebecca-reid/,
+                      https://homeschool.rebeccareid.com/vip/,
+
+                      https://homeschool.rebeccareid.com/posts/,
+                      https://homeschool.rebeccareid.com/homeschooling-articles/,
+                      https://homeschool.rebeccareid.com/marco-polo-silk-road/,
+
+                      https://homeschool.rebeccareid.com/shop/,
                       https://homeschool.rebeccareid.com/product/marco-polos-silk-road-game/,
-                      https://homeschool.rebeccareid.com/courses/
+                      https://homeschool.rebeccareid.com/cart/,
+                      https://homeschool.rebeccareid.com/checkout/,
+                      https://homeschool.rebeccareid.com/account/,
+
+                      https://homeschool.rebeccareid.com/courses/,
+                      https://homeschool.rebeccareid.com/courses/yes-you-can-homeschool/
 
             - name: Setup Node.JS
               uses: actions/setup-node@v2.4.0
