@@ -1,6 +1,6 @@
 /** @file Format And post data retrieved from Lighthouse. */
 
-import fetch from "node-fetch";
+import "isomorphic-fetch";
 
 /**
  * Join two arrays. (Just so syntax highlighting & prettier formatting work).
@@ -24,7 +24,7 @@ function graphql(query, ...placeholderValues) {
  *
  * @param {string} body - Body of the comment.
  *
- * @returns {Promise<unknown>} - Result from GitHub's GraphQL API.
+ * @returns {Promise<string>} - Result from GitHub's GraphQL API.
  */
 function commentOnDiscussion(body) {
 	return fetch("https://api.github.com/graphql", {
@@ -32,13 +32,13 @@ function commentOnDiscussion(body) {
 			// TODO: use gh action
 			query: graphql`mutation {
 					addDiscussionComment(
-						input: {discussionId: "MDEwOkRpc2N1c3Npb24zNDY2NDAy", body: ${JSON.stringify(body)}}
-						) {
-						  comment {
-							id
-						  }
-						}
-					  }`,
+						input: {discussionId: "", body: ${JSON.stringify(body)}}
+					) {
+					  comment {
+						id
+					  }
+					}
+				  }`,
 		}),
 
 		headers: {
@@ -58,7 +58,7 @@ function commentOnDiscussion(body) {
  *
  * @returns {T[][]} - Transposed array.
  */
- function transpose(array) {
+function transpose(array) {
 	return array[0].map((_, index) => array.map((row) => row[+index]));
 }
 
@@ -113,12 +113,20 @@ try {
 		`An error occurred while retrieving the data from Lighthouse.\n\`\`\`js\n${error}\n\`\`\``,
 	);
 
-	throw new Error(error);
+	throw error;
 }
 
 try {
-	const allScores = transpose(data.data.map(({scores}) => Object.values(scores)))
-		.map(getAverage).splice(2, 1);
+	const allScores = transpose(
+		data.data.map(({ scores }) => [
+			scores.accessibility,
+			scores.bestPractices,
+			scores.performance,
+			scores.seo,
+		]),
+	).map(getAverage);
+
+	console.log(data.data[0].emulatedFormFactor);
 
 	commentOnDiscussion(
 		`${
@@ -131,23 +139,31 @@ try {
 			"<th>SEO</th>" +
 			"<th>Overall</th>" +
 			"<th>PageSpeed Insights</th></tr></thead><tbody>"
-		}${data.data.reduce((accumulated, result) => {
-			const scores = Object.values(result.scores).splice(2, 1);
-
-			return (
-				`${accumulated}<tr><td><a href="${result.url.trim()}">${
-					(result.url[result.url.length - 1] === "/" ? result.url : `${result.url}/`)
+		}${data.data.reduce(
+			(accumulated, { scores, url, emulatedFormFactor }) =>
+				`${accumulated}<tr><td><a href="${url.trim()}">${
+					(url[url.length - 1] === "/" ? url : `${url}/`)
 						.trim()
 						.split("https://homeschool.rebeccareid.com")[1]
-					}</a></td>` +
-					`<td>${result.emulatedFormFactor}</td>` +
-					`<td>${scores.map(addEmoji).join("</td><td>")}</td>` +
-					`<td>${addEmoji(getAverage(scores))}</td><td>` +
-					`<a href="//developers.google.com/speed/pagespeed/insights/?url=${encodeURIComponent(
-						`${result.url.trim()}`,
-					)}&tab=${result.emulatedFormFactor}">More information</a></td></tr>`
-			);
-		}, "")}</tbody><tfoot><tr><td colspan="2"><b>Overall</b></td>` +
+				}</a></td>` +
+				`<td>${emulatedFormFactor}</td>` +
+				`<td>${addEmoji(scores.accessibility)}</td>` +
+				`<td>${addEmoji(scores.bestPractices)}</td>` +
+				`<td>${addEmoji(scores.performance)}</td>` +
+				`<td>${addEmoji(scores.seo)}</td>` +
+				`<td>${addEmoji(
+					getAverage([
+						scores.accessibility,
+						scores.bestPractices,
+						scores.performance,
+						scores.seo,
+					]),
+				)}</td><td>` +
+				`<a href="https://developers.google.com/speed/pagespeed/insights/?url=${encodeURIComponent(
+					`https://${url.trim()}`,
+				)}&tab=${emulatedFormFactor}">More information</a></td></tr>`,
+			"",
+		)}</tbody><tfoot><tr><td colspan="2"><b>Overall</b></td>` +
 			`<td><b>${allScores.map(addEmoji).join("</b></td><td><b>")}</b></td>` +
 			`<td colspan="2"><b><i>${addEmoji(
 				getAverage(allScores),

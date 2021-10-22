@@ -1,19 +1,20 @@
 {
-  "name": "lighthouse-auditor",
-  "version": "1.0.0",
-  "main": ".github/workflows/lighthouse.js",
-  "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RedGuy12/lighthouse-auditor.git"
-  },
-  "author": "RedGuy12",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/RedGuy12/lighthouse-auditor/issues"
-  },
-  "homepage": "https://github.com/RedGuy12/lighthouse-auditor#readme",
-  "dependencies": {
-    "node-fetch": "^2.6.1"
-  }
+	"name": "@redguy12/lighthouse-auditor",
+	"version": "1.0.0",
+	"private": true,
+	"homepage": "https://github.com/RedGuy12/lighthouse-auditor#readme",
+	"bugs": {
+		"url": "https://github.com/RedGuy12/lighthouse-auditor/issues"
+	},
+	"license": "MIT",
+	"author": "RedGuy12",
+	"main": ".github/workflows/lighthouse.js",
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/RedGuy12/lighthouse-auditor.git"
+	},
+	"dependencies": {
+		"isomorphic-fetch": "^3.0.0"
+	}
 }
